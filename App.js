@@ -10,7 +10,8 @@ export default class App extends React.Component {
   }
 
   state = {
-    isLoaded: false
+    isLoaded: false,
+    error: null
   };
 
   render() {
@@ -21,9 +22,12 @@ export default class App extends React.Component {
         {/*status bar*/}
         <StatusBar hidden={true} />
         {
+          //true
           this.state.isLoaded ? <Weather /> :
+            //false
             <View style={styles.Loading}>
               <Text style={styles.LoadingText}>Getting the fucking weather</Text>
+              {this.state.error ? <Text style={styles.errorText}>{this.state.error}</Text> : null}
             </View>
         }
       </View>
@@ -39,15 +43,18 @@ export default class App extends React.Component {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     navigator.geolocation.getCurrentPosition(
       position => {
-
         console.log(position);
         this.setState({
           isLoaded: true
+          //error: "somting went wrong.."
         });
       },
       error => {
-        console.log(error);
-        ToastAndroid.show(error, ToastAndroid.SHORT);
+        //console.log(error);
+        //ToastAndroid.show(error, ToastAndroid.SHORT);
+        this.setState({
+          error: error
+        })
       }
     );
   }
@@ -98,5 +105,9 @@ const styles = StyleSheet.create({
   LoadingText: {
     fontSize: 38,
     marginBottom: 50
+  },
+  errorText: {
+    color: "red",
+    backgroundColor: "transparent"
   }
 });
