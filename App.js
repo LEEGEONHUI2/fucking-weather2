@@ -32,7 +32,7 @@ export default class App extends React.Component {
 
   // 이벤트 등록
   componentDidMount() {
-    console.log("mounted123");
+    console.log("mounted123456");
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
 
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
