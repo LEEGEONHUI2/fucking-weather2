@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, StatusBar, ToastAndroid, BackHandler, ActivityIndicator } from 'react-native';
 import Weather from "./Weather";
 
-
+const API_KEY = "22bdb3ccd77e472a8f9aa781047f460b";
 export default class App extends React.Component {
 
   constructor(props) {
@@ -11,7 +11,9 @@ export default class App extends React.Component {
 
   state = {
     isLoaded: false,
-    error: null
+    error: null,
+    temperature: null,
+    name: null,
   };
 
   render() {
@@ -23,7 +25,7 @@ export default class App extends React.Component {
         <StatusBar hidden={true} />
         {
           //true
-          this.state.isLoaded ? <Weather /> :
+          this.state.isLoaded ? <Weather weatherName={this.state.name} temp={Math.floor(this.state.temperature - 273.15 )}/> :
             //false
             <View style={styles.Loading}>
               <Text style={styles.LoadingText}>Getting the fucking weather</Text>
@@ -40,17 +42,19 @@ export default class App extends React.Component {
     console.log("mounted");
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
 
-    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     navigator.geolocation.getCurrentPosition(
       position => {
         console.log(position);
+        this._getWeather(position.coords.latitude, position.coords.longitude);
+        /*
         this.setState({
           isLoaded: true
           //error: "somting went wrong.."
         });
+        */
       },
       error => {
-        //console.log(error);
+        console.log(error);
         //ToastAndroid.show(error, ToastAndroid.SHORT);
         this.setState({
           error: error
@@ -59,9 +63,35 @@ export default class App extends React.Component {
     );
   }
 
+  /*
+  (abc) => {console.log(abc)}
+  (abc) => {abc}    == {return abc}
+  function(abc) {
+    console.log(abc)
+  }
+  */
+
+  //날씨얻기
+  _getWeather = (lat, long) => {
+    fetch(
+      `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&APPID=${API_KEY}`
+    )
+      .then(abc => abc.json())
+      .then(json => {
+        console.log(json)
+        this.setState({
+          temperature: json.main.temp,
+          name: json.weather[0].main,
+          isLoaded : true
+        });
+      })
+  }
+
   // 이벤트 해제
-  componentWillUnmount() {
+  componentWillUnmount = () => {
     this.exitApp = false;
+
+    //Back handler
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
   }
 
